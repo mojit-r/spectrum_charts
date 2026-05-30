@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:spectrum_charts/model/chart.dart';
-import 'package:spectrum_charts/widgets/list_card.dart';
+import 'package:spectrum_charts/widgets/custom_search_bar.dart';
+import '../model/chart.dart';
+import '../provider/search_provider.dart';
+import '../widgets/list_card.dart';
+import 'package:provider/provider.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -20,14 +23,39 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
+    final searchProvider = context.watch<SearchProvider>();
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset('assets/icon/app_icon.png', height: 200),
+        title: searchProvider.isSearching
+            ? const SizedBox(height: 42, child: CustomSearchBar())
+            : Padding(
+                padding: const EdgeInsets.only(left: 12.0),
+                child: Image.asset('assets/icon/app_icon.png', height: 200),
+              ),
         elevation: 12,
         toolbarHeight: 70,
+        titleSpacing: 2,
         // centerTitle: true,
+        leading: searchProvider.isSearching
+            ? IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.search_rounded, size: 30),
+              )
+            : null,
         actions: [
-          IconButton(icon: const Icon(Icons.search_rounded, size: 30), onPressed: () {}),
+          IconButton(
+            icon: searchProvider.isSearching
+                ? const Icon(Icons.close, size: 30)
+                : const Icon(Icons.search_rounded, size: 30),
+
+            onPressed: searchProvider.isSearching
+                ? () {
+                    searchProvider.stopSearching();
+                  }
+                : () {
+                    searchProvider.setIsSearching();
+                  },
+          ),
         ],
       ),
       body: FutureBuilder<List<Chart>>(
