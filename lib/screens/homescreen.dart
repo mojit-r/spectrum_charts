@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:spectrum_charts/widgets/custom_search_bar.dart';
@@ -17,6 +18,7 @@ class Homescreen extends StatefulWidget {
 class _HomescreenState extends State<Homescreen> {
   late Future<List<Chart>> chartsFuture;
   final TextEditingController _searchController = TextEditingController();
+  DateTime? _lastBackPressed;
 
   @override
   void initState() {
@@ -72,40 +74,68 @@ class _HomescreenState extends State<Homescreen> {
           ),
         ],
       ),
-      body: FutureBuilder<List<Chart>>(
-        future: chartsFuture,
-        builder: (context, snapshot) {
-          // ⏳ Loading
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (searchProvider.isSearching) {
+            searchProvider.stopSearching();
+            return;
           }
 
-          // ❌ Error
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+          final now = DateTime.now();
+
+          if (_lastBackPressed == null ||
+              now.difference(_lastBackPressed!) > const Duration(seconds: 2)) {
+            _lastBackPressed = now;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.grey[850],
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(milliseconds: 1800),
+                content: const Text('Tap again to exit'),
+              ),
+            );
+            return;
           }
 
-          // ⚠️ No data
-          if (!snapshot.hasData) {
-            return const Center(child: Text('No data found'));
-          }
-
-          final charts = snapshot.data!;
-          return ListView.builder(
-            itemCount: charts.length,
-            // itemExtent: 56,
-            // cacheExtent: 300,
-            itemBuilder: (context, index) {
-              final chart = charts[index];
-
-              return ListCard(
-                key: ValueKey(chart.chartName),
-                chartNumber: chart.chartNumber,
-                chartName: chart.chartName,
-              );
-            },
-          );
+          SystemNavigator.pop();
         },
+        child: FutureBuilder<List<Chart>>(
+          future: chartsFuture,
+          builder: (context, snapshot) {
+            // ⏳ Loading
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            // ❌ Error
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
+            // ⚠️ No data
+            if (!snapshot.hasData) {
+              return const Center(child: Text('No data found'));
+            }
+
+            final charts = snapshot.data!;
+            return ListView.builder(
+              itemCount: charts.length,
+              // itemExtent: 56,
+              // cacheExtent: 300,
+              itemBuilder: (context, index) {
+                final chart = charts[index];
+
+                return ListCard(
+                  key: ValueKey(chart.chartName),
+                  chartNumber: chart.chartNumber,
+                  chartName: chart.chartName,
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
