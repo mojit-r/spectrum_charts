@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:spectrum_charts/widgets/custom_search_bar.dart';
+
 import '../model/chart.dart';
 import '../provider/search_provider.dart';
 import '../widgets/list_card.dart';
-import 'package:provider/provider.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -14,6 +16,7 @@ class Homescreen extends StatefulWidget {
 
 class _HomescreenState extends State<Homescreen> {
   late Future<List<Chart>> chartsFuture;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -22,36 +25,47 @@ class _HomescreenState extends State<Homescreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final searchProvider = context.watch<SearchProvider>();
     return Scaffold(
       appBar: AppBar(
-        title: searchProvider.isSearching
-            ? const SizedBox(height: 42, child: CustomSearchBar())
-            : Padding(
-                padding: const EdgeInsets.only(left: 12.0),
-                child: Image.asset('assets/icon/app_icon.png', height: 200),
-              ),
+        title: AnimatedCrossFade(
+          duration: const Duration(milliseconds: 450),
+          firstChild: Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: Image.asset('assets/icon/app_icon.png', height: 200),
+          ),
+          secondChild: SizedBox(
+            height: 42,
+            child: CustomSearchBar(controller: _searchController),
+          ),
+          crossFadeState: searchProvider.isSearching
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+        ),
         elevation: 12,
         toolbarHeight: 70,
         titleSpacing: 2,
         // centerTitle: true,
         leading: searchProvider.isSearching
             ? IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.search_rounded, size: 30),
+                onPressed: () {
+                  searchProvider.stopSearching();
+                },
+                icon: const Icon(Icons.arrow_back, size: 30),
               )
             : null,
         actions: [
           IconButton(
-            icon: searchProvider.isSearching
-                ? const Icon(Icons.close, size: 30)
-                : const Icon(Icons.search_rounded, size: 30),
-
+            icon: const Icon(Icons.search_rounded, size: 30),
             onPressed: searchProvider.isSearching
-                ? () {
-                    searchProvider.stopSearching();
-                  }
+                ? () {}
                 : () {
                     searchProvider.setIsSearching();
                   },

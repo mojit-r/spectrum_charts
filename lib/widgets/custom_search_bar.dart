@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
 class CustomSearchBar extends StatelessWidget {
-  const CustomSearchBar({super.key});
+  final TextEditingController controller;
+  
+  const CustomSearchBar({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    return const TextField(
+    return TextField(
+      controller: controller,
       keyboardType: TextInputType.name,
       textAlignVertical: TextAlignVertical.center,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         contentPadding: EdgeInsets.symmetric(horizontal: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
