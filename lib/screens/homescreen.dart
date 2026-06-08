@@ -4,8 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:spectrum_charts/widgets/custom_search_bar.dart';
 
-import '../model/chart.dart';
-import '../provider/search_provider.dart';
+import '../provider/chart_provider.dart';
 import '../widgets/list_card.dart';
 
 class Homescreen extends StatefulWidget {
@@ -16,14 +15,15 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
-  late Future<List<Chart>> chartsFuture;
   final TextEditingController _searchController = TextEditingController();
   DateTime? _lastBackPressed;
 
   @override
   void initState() {
     super.initState();
-    chartsFuture = loadJson();
+    Future.microtask(() {
+      context.read<ChartProvider>().loadCharts();
+    });
   }
 
   @override
@@ -34,7 +34,7 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
-    final searchProvider = context.watch<SearchProvider>();
+    final chartProvider = context.watch<ChartProvider>();
     return Scaffold(
       appBar: AppBar(
         title: AnimatedCrossFade(
@@ -47,7 +47,7 @@ class _HomescreenState extends State<Homescreen> {
             height: 42,
             child: CustomSearchBar(controller: _searchController),
           ),
-          crossFadeState: searchProvider.isSearching
+          crossFadeState: chartProvider.isSearching
               ? CrossFadeState.showSecond
               : CrossFadeState.showFirst,
         ),
@@ -55,10 +55,11 @@ class _HomescreenState extends State<Homescreen> {
         toolbarHeight: 70,
         titleSpacing: 2,
         // centerTitle: true,
-        leading: searchProvider.isSearching
+        leading: chartProvider.isSearching
             ? IconButton(
                 onPressed: () {
-                  searchProvider.stopSearching();
+                  chartProvider.stopSearching();
+                  _searchController.clear();
                 },
                 icon: const Icon(Icons.arrow_back, size: 30),
               )
@@ -66,10 +67,10 @@ class _HomescreenState extends State<Homescreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded, size: 30),
-            onPressed: searchProvider.isSearching
+            onPressed: chartProvider.isSearching
                 ? () {}
                 : () {
-                    searchProvider.setIsSearching();
+                    chartProvider.setIsSearching();
                   },
           ),
         ],
@@ -77,8 +78,9 @@ class _HomescreenState extends State<Homescreen> {
       body: PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) {
-          if (searchProvider.isSearching) {
-            searchProvider.stopSearching();
+          if (chartProvider.isSearching) {
+            chartProvider.stopSearching();
+            _searchController.clear();
             return;
           }
 
@@ -101,38 +103,17 @@ class _HomescreenState extends State<Homescreen> {
 
           SystemNavigator.pop();
         },
-        child: FutureBuilder<List<Chart>>(
-          future: chartsFuture,
-          builder: (context, snapshot) {
-            // ⏳ Loading
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+        child: ListView.builder(
+          itemCount: chartProvider.filteredCharts.length,
+          // itemExtent: 56,
+          // cacheExtent: 300,
+          itemBuilder: (context, index) {
+            final chart = chartProvider.filteredCharts[index];
 
-            // ❌ Error
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-
-            // ⚠️ No data
-            if (!snapshot.hasData) {
-              return const Center(child: Text('No data found'));
-            }
-
-            final charts = snapshot.data!;
-            return ListView.builder(
-              itemCount: charts.length,
-              // itemExtent: 56,
-              // cacheExtent: 300,
-              itemBuilder: (context, index) {
-                final chart = charts[index];
-
-                return ListCard(
-                  key: ValueKey(chart.chartName),
-                  chartNumber: chart.chartNumber,
-                  chartName: chart.chartName,
-                );
-              },
+            return ListCard(
+              key: ValueKey(chart.chartName),
+              chartNumber: chart.chartNumber,
+              chartName: chart.chartName,
             );
           },
         ),
