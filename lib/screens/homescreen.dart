@@ -45,7 +45,12 @@ class _HomescreenState extends State<Homescreen> {
           ),
           secondChild: SizedBox(
             height: 42,
-            child: CustomSearchBar(controller: _searchController),
+            child: CustomSearchBar(
+              controller: _searchController,
+              onChanged: (value) {
+                context.read<ChartProvider>().filterCharts(value);
+              },
+            ),
           ),
           crossFadeState: chartProvider.isSearching
               ? CrossFadeState.showSecond
