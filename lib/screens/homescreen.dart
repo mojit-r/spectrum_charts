@@ -16,6 +16,7 @@ class Homescreen extends StatefulWidget {
 
 class _HomescreenState extends State<Homescreen> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   DateTime? _lastBackPressed;
 
   @override
@@ -29,6 +30,7 @@ class _HomescreenState extends State<Homescreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -108,19 +110,24 @@ class _HomescreenState extends State<Homescreen> {
 
           SystemNavigator.pop();
         },
-        child: ListView.builder(
-          itemCount: chartProvider.filteredCharts.length,
-          // itemExtent: 56,
-          // cacheExtent: 300,
-          itemBuilder: (context, index) {
-            final chart = chartProvider.filteredCharts[index];
-
-            return ListCard(
-              key: ValueKey(chart.chartName),
-              chartNumber: chart.chartNumber,
-              chartName: chart.chartName,
-            );
-          },
+        child: Scrollbar(
+          controller: _scrollController,
+          thumbVisibility: true,
+          child: ListView.builder(
+            controller: _scrollController,
+            itemCount: chartProvider.filteredCharts.length,
+            // itemExtent: 56,
+            // cacheExtent: 300,
+            itemBuilder: (context, index) {
+              final chart = chartProvider.filteredCharts[index];
+          
+              return ListCard(
+                key: ValueKey(chart.chartName),
+                chartNumber: chart.chartNumber,
+                chartName: chart.chartName,
+              );
+            },
+          ),
         ),
       ),
     );

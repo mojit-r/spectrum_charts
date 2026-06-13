@@ -29,7 +29,6 @@ const ColorScheme lightColorScheme = ColorScheme(
   surfaceTint: Color(0xFF6D6A2E),
 );
 
-
 const ColorScheme darkColorScheme = ColorScheme(
   brightness: Brightness.dark,
 
@@ -70,8 +69,17 @@ ThemeData lightmode = ThemeData(
 
   scaffoldBackgroundColor: const Color.fromARGB(255, 255, 254, 244),
 
+  scrollbarTheme: ScrollbarThemeData(
+    thumbColor: WidgetStateProperty.resolveWith((state) {
+      if (state.contains(WidgetState.dragged)) {
+        return const Color(0xFFD6D27A);
+      }
+      return const Color(0xFFD7D8C4);
+    }),
+    thickness: WidgetStateProperty.all(6.0),
+    radius: const Radius.circular(4),
+  ),
 );
-
 
 ThemeData darkmode = ThemeData(
   useMaterial3: true,
@@ -84,8 +92,17 @@ ThemeData darkmode = ThemeData(
     color: const Color(0xFF24241D),
     elevation: 2,
 
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  ),
+
+  scrollbarTheme: ScrollbarThemeData(
+    thumbColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.dragged)) {
+        return const Color(0xFF6D6A2E);
+      }
+      return const Color(0xFF8C8A4F);
+    }),
+    thickness: WidgetStateProperty.all(8),
+    radius: const Radius.circular(12),
   ),
 );
