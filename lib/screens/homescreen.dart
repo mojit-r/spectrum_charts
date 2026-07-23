@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:spectrum_charts/widgets/custom_search_bar.dart';
 
-import '../provider/chart_provider.dart';
+import '../providers/chart_provider.dart';
 import '../widgets/list_card.dart';
 
 class Homescreen extends StatefulWidget {

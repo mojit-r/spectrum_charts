@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spectrum_charts/provider/chart_provider.dart';
+import 'package:spectrum_charts/providers/chart_provider.dart';
 
 import 'package:spectrum_charts/screens/homescreen.dart';
 import 'package:spectrum_charts/theme/theme.dart';
