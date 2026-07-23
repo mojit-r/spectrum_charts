@@ -8,6 +8,9 @@ class ChartProvider extends ChangeNotifier {
 
   List<Chart> get filteredCharts => _filteredCharts;
 
+  String _searchedQuery = '';
+  String get searchedQuery => _searchedQuery;
+
   bool _isSearching = false;
   bool get isSearching => _isSearching;
 
@@ -23,6 +26,7 @@ class ChartProvider extends ChangeNotifier {
   }
 
   void filterCharts(String query) {
+    _searchedQuery = query;
     if (query.isEmpty) {
       _filteredCharts = List.from(_allCharts);
     } else {
@@ -42,6 +46,7 @@ class ChartProvider extends ChangeNotifier {
   void stopSearching() {
     _isSearching = false;
     _filteredCharts = List.from(_allCharts);
+    _searchedQuery = '';
     notifyListeners();
   }
 }
