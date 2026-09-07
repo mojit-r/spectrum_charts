@@ -23,6 +23,7 @@ class _HomescreenState extends State<Homescreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
+      if (!mounted) return;
       context.read<ChartProvider>().loadCharts();
     });
   }
@@ -120,7 +121,7 @@ class _HomescreenState extends State<Homescreen> {
             // cacheExtent: 300,
             itemBuilder: (context, index) {
               final chart = chartProvider.filteredCharts[index];
-          
+
               return ListCard(
                 key: ValueKey(chart.chartName),
                 chartNumber: chart.chartNumber,
