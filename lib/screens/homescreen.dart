@@ -15,9 +15,10 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
-  final TextEditingController _searchController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
+  late final TextEditingController _searchController;
+  late final ScrollController _scrollController;
   DateTime? _lastBackPressed;
+  late FocusNode _searchFocus;
 
   @override
   void initState() {
@@ -26,12 +27,16 @@ class _HomescreenState extends State<Homescreen> {
       if (!mounted) return;
       context.read<ChartProvider>().loadCharts();
     });
+    _searchController = TextEditingController();
+    _scrollController = ScrollController();
+    _searchFocus = FocusNode();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _scrollController.dispose();
+    _searchFocus.dispose();
     super.dispose();
   }
 
@@ -53,6 +58,7 @@ class _HomescreenState extends State<Homescreen> {
               onChanged: (value) {
                 context.read<ChartProvider>().filterCharts(value);
               },
+              focusNode: _searchFocus,
             ),
           ),
           crossFadeState: chartProvider.isSearching
@@ -62,7 +68,6 @@ class _HomescreenState extends State<Homescreen> {
         elevation: 12,
         toolbarHeight: 70,
         titleSpacing: 2,
-        // centerTitle: true,
         leading: chartProvider.isSearching
             ? IconButton(
                 onPressed: () {
@@ -79,6 +84,9 @@ class _HomescreenState extends State<Homescreen> {
                 ? () {}
                 : () {
                     chartProvider.setIsSearching();
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _searchFocus.requestFocus();
+                    });
                   },
           ),
         ],
