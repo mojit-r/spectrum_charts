@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:spectrum_charts/widgets/custom_search_bar.dart';
+import 'package:spectrum_charts/widgets/draggable_index_scrollbar.dart';
 
 import '../providers/chart_provider.dart';
 import '../widgets/list_card.dart';
@@ -119,17 +120,16 @@ class _HomescreenState extends State<Homescreen> {
 
           SystemNavigator.pop();
         },
-        child: Scrollbar(
+        child: DraggableIndexScrollbar(
           controller: _scrollController,
-          thumbVisibility: true,
+          itemCount: chartProvider.filteredCharts.length,
+          isSearching: chartProvider.isSearching,
           child: ListView.builder(
             controller: _scrollController,
             itemCount: chartProvider.filteredCharts.length,
-            // itemExtent: 56,
-            // cacheExtent: 300,
+            physics: const BouncingScrollPhysics(),
             itemBuilder: (context, index) {
               final chart = chartProvider.filteredCharts[index];
-
               return ListCard(
                 key: ValueKey(chart.chartName),
                 chartNumber: chart.chartNumber,
