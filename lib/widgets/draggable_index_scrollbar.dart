@@ -176,7 +176,9 @@ class _DraggableIndexScrollbarState extends State<DraggableIndexScrollbar>
                               decoration: BoxDecoration(
                                 color: _dragging
                                     ? theme.colorScheme.primary
-                                    : theme.colorScheme.outline,
+                                    : theme.colorScheme.primary.withValues(
+                                        alpha: 0.65,
+                                      ),
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(
                                     widget.thumbHeight / 2,
@@ -197,9 +199,7 @@ class _DraggableIndexScrollbarState extends State<DraggableIndexScrollbar>
                               child: Icon(
                                 Icons.drag_indicator,
                                 size: 16,
-                                color: _dragging
-                                    ? theme.colorScheme.onPrimary
-                                    : theme.colorScheme.surface,
+                                color: theme.colorScheme.onPrimary,
                               ),
                             ),
                           ),

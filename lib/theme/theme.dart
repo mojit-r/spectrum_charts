@@ -94,15 +94,4 @@ ThemeData darkmode = ThemeData(
 
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
   ),
-
-  scrollbarTheme: ScrollbarThemeData(
-    thumbColor: WidgetStateProperty.resolveWith((states) {
-      if (states.contains(WidgetState.dragged)) {
-        return const Color(0xFF6D6A2E);
-      }
-      return const Color(0xFF8C8A4F);
-    }),
-    thickness: WidgetStateProperty.all(8),
-    radius: const Radius.circular(12),
-  ),
 );
